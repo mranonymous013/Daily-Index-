@@ -1,0 +1,6 @@
+{
+  "name": "DailyFlow",
+  "description": "Daily habit tracker and expense manager with budgets, streaks, 7-day analytics, and cloud sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

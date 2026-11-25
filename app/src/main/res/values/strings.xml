@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">DailyFlow</string>
+    <string name="app_tagline">Habits &amp; Daily Expenses</string>
+
+    <!-- Auth Screen -->
+    <string name="auth_subtitle">Track daily habits, streaks, and spending with real-time cloud sync.</string>
+    <string name="auth_feature_habits_title">Daily Habits &amp; Streaks</string>
+    <string name="auth_feature_habits_desc">One-tap check-ins with streak tracking and 7-day consistency dots.</string>
+    <string name="auth_feature_expenses_title">Daily Expense &amp; Budget Tracker</string>
+    <string name="auth_feature_expenses_desc">Log spending in ৳ by category with daily budget progress alerts.</string>
+    <string name="auth_feature_sync_title">Synced Across Devices</string>
+    <string name="auth_feature_sync_desc">Sign in with Google to keep your data backed up on phone and laptop.</string>
+    <string name="auth_sign_in_google">Sign in with Google</string>
+    <string name="auth_signing_in">Signing in…</string>
+    <string name="auth_privacy_note">Your habits and expenses are stored privately under your Google account.</string>
+
+    <!-- Header & Navigation -->
+    <string name="nav_habits">Habits</string>
+    <string name="nav_expenses">Expenses</string>
+    <string name="nav_summary">Summary</string>
+    <string name="action_today">Today</string>
+    <string name="action_sign_out">Sign out</string>
+    <string name="cd_previous_day">Previous day</string>
+    <string name="cd_next_day">Next day</string>
+    <string name="cd_account_menu">Account options</string>
+    <string name="kpi_habits_done">Habits Done</string>
+    <string name="kpi_days_spend">Day\'s Spend</string>
+    <string name="kpi_over_budget">Over budget</string>
+
+    <!-- Habits Tab -->
+    <string name="habit_input_placeholder">Add a daily habit (e.g. Drink water)</string>
+    <string name="action_add">Add</string>
+    <string name="label_icon">Icon:</string>
+    <string name="habit_empty_title">No habits yet</string>
+    <string name="habit_empty_subtitle">Add your first daily habit above to start building streaks.</string>
+    <string name="habit_tap_to_complete">Tap to complete</string>
+    <string name="cd_toggle_habit">Toggle habit %1$s</string>
+    <string name="cd_delete_habit">Delete habit %1$s</string>
+
+    <!-- Expenses Tab -->
+    <string name="expense_title_placeholder">What did you buy?</string>
+    <string name="expense_amount_placeholder">Amount</string>
+    <string name="expense_category_label">Category</string>
+    <string name="expense_empty_title">No expenses logged</string>
+    <string name="expense_empty_all">Add a purchase above to track your daily spending.</string>
+    <string name="expense_empty_category">No expenses in %1$s for this day.</string>
+    <string name="cd_delete_expense">Delete expense %1$s</string>
+
+    <!-- Summary & Dashboard Chart -->
+    <string name="summary_7day_spending">Last 7 Days Spending</string>
+    <string name="summary_no_daily_limit">No daily limit</string>
+    <string name="chart_open_day">View day</string>
+    <string name="chart_legend_selected">Selected</string>
+    <string name="chart_legend_over_budget">Over budget</string>
+    <string name="chart_legend_budget_line">Daily budget</string>
+    <string name="summary_category_breakdown">7-Day Spending by Category</string>
+    <string name="summary_category_empty">Log expenses to see your category breakdown.</string>
+    <string name="summary_habit_consistency">7-Day Habit Consistency</string>
+    <string name="summary_habit_empty">Add habits to track your 7-day consistency.</string>
+    <string name="summary_settings_backup">Settings &amp; Backup</string>
+    <string name="summary_daily_budget_label">Daily Budget (৳)</string>
+    <string name="action_save">Save</string>
+    <string name="action_export_backup">Export Backup</string>
+    <string name="action_import_backup">Import Backup</string>
+    <string name="action_clear_history">Clear All Expenses &amp; History</string>
+
+    <!-- Dialogs & States -->
+    <string name="dialog_clear_title">Clear expenses &amp; history?</string>
+    <string name="dialog_clear_message">This removes all logged expenses and resets habit check-ins while keeping your habit list.</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_clear_data">Clear Data</string>
+    <string name="dialog_sign_out_title">Sign out of DailyFlow?</string>
+    <string name="dialog_sign_out_message">Your habits and expenses remain safely synced in the cloud for when you sign back in.</string>
+    <string name="state_loading">Syncing your DailyFlow…</string>
+    <string name="state_error_title">Could not sync data</string>
+    <string name="action_retry">Retry</string>
+</resources>

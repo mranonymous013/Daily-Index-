@@ -1,0 +1,129 @@
+{
+  "entities": {
+    "UserSettings": {
+      "title": "UserSettings",
+      "description": "Per-user DailyFlow preferences including daily budget and default habit seeding status.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning user."
+        },
+        "dailyBudget": {
+          "type": "number",
+          "description": "Daily spending budget limit in BDT (0 disables daily limit)."
+        },
+        "currencySymbol": {
+          "type": "string",
+          "description": "Currency symbol displayed across expenses and budgets (default ৳)."
+        },
+        "defaultsSeeded": {
+          "type": "boolean",
+          "description": "Whether the starter habits were already seeded for this user."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when settings were created; clients must submit FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last settings update; clients must submit FieldValue.serverTimestamp()."
+        }
+      },
+      "required": ["userId", "dailyBudget", "currencySymbol", "defaultsSeeded", "createdAt", "updatedAt"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "A recurring daily habit tracked by a user with completion date keys (YYYY-MM-DD).",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning user."
+        },
+        "name": {
+          "type": "string",
+          "description": "Habit display name (1 to 60 characters)."
+        },
+        "icon": {
+          "type": "string",
+          "description": "Emoji icon representing the habit."
+        },
+        "completedDates": {
+          "type": "array",
+          "description": "Bounded list of YYYY-MM-DD date strings when the habit was completed."
+        },
+        "sortOrder": {
+          "type": "integer",
+          "description": "Ordering value for displaying habits consistently."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the habit was created; clients must submit FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last habit update; clients must submit FieldValue.serverTimestamp()."
+        }
+      },
+      "required": ["userId", "name", "icon", "completedDates", "sortOrder", "createdAt", "updatedAt"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "A single daily expense entry logged by a user on a specific YYYY-MM-DD date.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owning user."
+        },
+        "date": {
+          "type": "string",
+          "description": "Expense date key in YYYY-MM-DD format."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short description of the purchase (1 to 60 characters)."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Positive numeric expense amount."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Food", "Transport", "Groceries", "Bills", "Shopping", "Health", "Other"],
+          "description": "Expense category identifier."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the expense was created; clients must submit FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last expense update; clients must submit FieldValue.serverTimestamp()."
+        }
+      },
+      "required": ["userId", "date", "title", "amount", "category", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserSettings" },
+      "description": "User-scoped DailyFlow budget and app settings document."
+    },
+    "/users/{userId}/habits/{habitId}": {
+      "schema": { "$ref": "#/entities/Habit" },
+      "description": "User-scoped daily habits and completion date history."
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/Expense" },
+      "description": "User-scoped daily expense records."
+    }
+  }
+}

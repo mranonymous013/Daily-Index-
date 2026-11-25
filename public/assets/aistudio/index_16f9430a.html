@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DailyFlow">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>DailyFlow — Habits & Daily Expenses</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f766e'/%3E%3Cpath d='M18 33l9 9 19-20' stroke='%23ffffff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230f766e'/%3E%3Cpath d='M50 93l26 26 54-58' stroke='%23ffffff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .check-pop {
+      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .check-pop:active {
+      transform: scale(0.92);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24">
+  <div class="max-w-lg mx-auto min-h-screen flex flex-col">
+    <!-- Top Header -->
+    <header class="bg-teal-700 text-white px-4 pt-5 pb-6 rounded-b-3xl shadow-md">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold leading-tight">DailyFlow</h1>
+            <p class="text-xs text-teal-100">Habits & Daily Expenses</p>
+          </div>
+        </div>
+        <button id="todayBtn" type="button" class="text-xs font-medium bg-white/15 hover:bg-white/25 active:bg-white/30 px-3 py-1.5 rounded-full transition">
+          Today
+        </button>
+      </div>
+
+      <!-- Date Switcher -->
+      <div class="flex items-center justify-between bg-white/10 rounded-2xl px-2 py-1.5 mb-4">
+        <button id="prevDayBtn" type="button" aria-label="Previous day" class="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-white/15 active:bg-white/25 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="text-center">
+          <div id="dateLabel" class="text-sm font-semibold">Today</div>
+          <div id="dateSubLabel" class="text-xs text-teal-100"></div>
+        </div>
+        <button id="nextDayBtn" type="button" aria-label="Next day" class="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-white/15 active:bg-white/25 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Quick KPI Cards -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-3">
+          <div class="flex items-center justify-between text-xs text-teal-100 mb-1">
+            <span>Habits Done</span>
+            <span id="habitPct" class="font-semibold text-white">0%</span>
+          </div>
+          <div id="habitCount" class="text-xl font-bold mb-1.5">0 / 0</div>
+          <div class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+            <div id="habitBar" class="h-full bg-emerald-300 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-3">
+          <div class="flex items-center justify-between text-xs text-teal-100 mb-1">
+            <span>Day's Spend</span>
+            <span id="budgetStatus" class="font-semibold text-white"></span>
+          </div>
+          <div id="daySpend" class="text-xl font-bold mb-1.5">৳0</div>
+          <div class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+            <div id="budgetBar" class="h-full bg-amber-300 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 pt-5 space-y-4">
+      <!-- HABITS TAB -->
+      <section id="tab-habits" class="space-y-4">
+        <form id="habitForm" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70 space-y-3">
+          <div class="flex gap-2">
+            <input id="habitInput" type="text" maxlength="60" placeholder="Add a daily habit (e.g. Drink water)" class="flex-1 min-w-0 px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white">
+            <button type="submit" class="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white text-sm font-semibold rounded-xl transition shrink-0">
+              Add
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 px-0.5" id="iconPicker">
+            <span class="text-xs text-slate-400 mr-1 shrink-0">Icon:</span>
+            <button type="button" data-icon="💧" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-teal-50 ring-2 ring-teal-500 shrink-0">💧</button>
+            <button type="button" data-icon="📚" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">📚</button>
+            <button type="button" data-icon="🏃" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">🏃</button>
+            <button type="button" data-icon="🧘" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">🧘</button>
+            <button type="button" data-icon="💊" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">💊</button>
+            <button type="button" data-icon="✍️" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">✍️</button>
+            <button type="button" data-icon="🥗" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">🥗</button>
+            <button type="button" data-icon="⭐" class="icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0">⭐</button>
+          </div>
+        </form>
+
+        <div id="habitList" class="space-y-2.5"></div>
+      </section>
+
+      <!-- EXPENSES TAB -->
+      <section id="tab-expenses" class="hidden space-y-4">
+        <form id="expenseForm" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input id="expenseTitle" type="text" maxlength="60" placeholder="What did you buy?" class="sm:col-span-2 px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white">
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">৳</span>
+              <input id="expenseAmount" type="number" step="any" min="0.01" inputmode="decimal" placeholder="Amount" class="w-full pl-7 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white">
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="expenseCategory" class="flex-1 px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white">
+              <option value="Food">🍔 Food & Dining</option>
+              <option value="Transport">🚌 Transport</option>
+              <option value="Groceries">🛒 Groceries</option>
+              <option value="Bills">💡 Bills & Utilities</option>
+              <option value="Shopping">🛍️ Shopping</option>
+              <option value="Health">🩺 Health</option>
+              <option value="Other">📦 Other</option>
+            </select>
+            <button type="submit" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white text-sm font-semibold rounded-xl transition shrink-0">
+              Add
+            </button>
+          </div>
+        </form>
+
+        <!-- Category Filter Chips -->
+        <div id="categoryFilters" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"></div>
+
+        <!-- Expense List -->
+        <div id="expenseList" class="space-y-2.5"></div>
+      </section>
+
+      <!-- SUMMARY TAB -->
+      <section id="tab-summary" class="hidden space-y-4">
+        <!-- 7-Day Spending Chart -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-sm font-bold text-slate-800">Last 7 Days Spending</h2>
+              <p id="weeklySpendTotal" class="text-xs text-slate-500">Total: ৳0</p>
+            </div>
+            <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-teal-50 text-teal-700" id="dailyBudgetBadge">Budget: ৳1,000/day</span>
+          </div>
+          <div id="weeklyChart" class="grid grid-cols-7 gap-2 items-end h-36 pt-4"></div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70">
+          <h2 class="text-sm font-bold text-slate-800 mb-3">7-Day Spending by Category</h2>
+          <div id="categoryBreakdown" class="space-y-2.5"></div>
+        </div>
+
+        <!-- 7-Day Habit Consistency -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70">
+          <h2 class="text-sm font-bold text-slate-800 mb-3">7-Day Habit Consistency</h2>
+          <div id="habitWeeklyGrid" class="space-y-3"></div>
+        </div>
+
+        <!-- Settings & Backup -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/70 space-y-3">
+          <h2 class="text-sm font-bold text-slate-800">Settings & Backup</h2>
+          <form id="budgetForm" class="flex items-center gap-2">
+            <label for="budgetInput" class="text-xs font-medium text-slate-600 shrink-0">Daily Budget (৳):</label>
+            <input id="budgetInput" type="number" min="0" step="50" class="flex-1 min-w-0 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <button type="submit" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition shrink-0">Save</button>
+          </form>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button id="exportBtn" type="button" class="px-3 py-2.5 text-xs font-semibold rounded-xl bg-teal-50 text-teal-700 hover:bg-teal-100 transition">
+              Export Backup
+            </button>
+            <label class="px-3 py-2.5 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition text-center cursor-pointer">
+              Import Backup
+              <input id="importInput" type="file" accept="application/json" class="hidden">
+            </label>
+          </div>
+          <button id="resetBtn" type="button" class="w-full py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition">
+            Clear All Expenses & History
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-30">
+    <div class="max-w-lg mx-auto grid grid-cols-3">
+      <button type="button" data-tab="habits" class="nav-btn flex flex-col items-center justify-center py-2.5 text-teal-700 font-semibold transition">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-xs">Habits</span>
+      </button>
+      <button type="button" data-tab="expenses" class="nav-btn flex flex-col items-center justify-center py-2.5 text-slate-400 hover:text-slate-600 font-medium transition">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-xs">Expenses</span>
+      </button>
+      <button type="button" data-tab="summary" class="nav-btn flex flex-col items-center justify-center py-2.5 text-slate-400 hover:text-slate-600 font-medium transition">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <span class="text-xs">Summary</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 hidden">
+    <div class="bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-3">
+      <span id="toastText"></span>
+      <button id="toastUndoBtn" type="button" class="hidden text-teal-300 font-bold hover:underline">Undo</button>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl space-y-3">
+      <h3 class="text-base font-bold text-slate-900">Clear expenses & history?</h3>
+      <p class="text-sm text-slate-600">This removes all logged expenses and resets habit check-ins while keeping your habit list.</p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="cancelResetBtn" type="button" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition">Cancel</button>
+        <button id="confirmResetBtn" type="button" class="px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition">Clear Data</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'dailyflow_app_v1';
+      const CATEGORIES = [
+        { id: 'Food', icon: '🍔', color: 'bg-orange-100 text-orange-700', bar: 'bg-orange-400' },
+        { id: 'Transport', icon: '🚌', color: 'bg-sky-100 text-sky-700', bar: 'bg-sky-400' },
+        { id: 'Groceries', icon: '🛒', color: 'bg-emerald-100 text-emerald-700', bar: 'bg-emerald-400' },
+        { id: 'Bills', icon: '💡', color: 'bg-amber-100 text-amber-700', bar: 'bg-amber-400' },
+        { id: 'Shopping', icon: '🛍️', color: 'bg-purple-100 text-purple-700', bar: 'bg-purple-400' },
+        { id: 'Health', icon: '🩺', color: 'bg-rose-100 text-rose-700', bar: 'bg-rose-400' },
+        { id: 'Other', icon: '📦', color: 'bg-slate-100 text-slate-700', bar: 'bg-slate-400' }
+      ];
+
+      function toDateKey(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      function parseDateKey(key) {
+        const [y, m, d] = key.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      function shiftDate(key, days) {
+        const dt = parseDateKey(key);
+        dt.setDate(dt.getDate() + days);
+        return toDateKey(dt);
+      }
+
+      function formatCurrency(num) {
+        const value = Number(num) || 0;
+        const hasDecimals = Math.abs(value % 1) > 0.001;
+        return '৳' + value.toLocaleString('en-IN', {
+          minimumFractionDigits: hasDecimals ? 2 : 0,
+          maximumFractionDigits: 2
+        });
+      }
+
+      function defaultState() {
+        return {
+          dailyBudget: 1000,
+          habits: [
+            { id: 'h1', name: 'Drink 8 glasses of water', icon: '💧', completedDates: [] },
+            { id: 'h2', name: 'Read for 20 minutes', icon: '📚', completedDates: [] },
+            { id: 'h3', name: 'Walk 30 minutes', icon: '🏃', completedDates: [] }
+          ],
+          expenses: []
+        };
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return defaultState();
+          const parsed = JSON.parse(raw);
+          return {
+            dailyBudget: typeof parsed.dailyBudget === 'number' ? parsed.dailyBudget : 1000,
+            habits: Array.isArray(parsed.habits) ? parsed.habits : defaultState().habits,
+            expenses: Array.isArray(parsed.expenses) ? parsed.expenses : []
+          };
+        } catch (e) {
+          return defaultState();
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          // Storage may be restricted in private browsing
+        }
+      }
+
+      let state = loadState();
+      let selectedDate = toDateKey(new Date());
+      let activeTab = 'habits';
+      let selectedIcon = '💧';
+      let selectedCategoryFilter = 'All';
+      let undoAction = null;
+      let toastTimer = null;
+
+      // DOM refs
+      const dateLabel = document.getElementById('dateLabel');
+      const dateSubLabel = document.getElementById('dateSubLabel');
+      const habitCountEl = document.getElementById('habitCount');
+      const habitPctEl = document.getElementById('habitPct');
+      const habitBarEl = document.getElementById('habitBar');
+      const daySpendEl = document.getElementById('daySpend');
+      const budgetStatusEl = document.getElementById('budgetStatus');
+      const budgetBarEl = document.getElementById('budgetBar');
+
+      const habitListEl = document.getElementById('habitList');
+      const expenseListEl = document.getElementById('expenseList');
+      const categoryFiltersEl = document.getElementById('categoryFilters');
+
+      const weeklySpendTotalEl = document.getElementById('weeklySpendTotal');
+      const dailyBudgetBadgeEl = document.getElementById('dailyBudgetBadge');
+      const weeklyChartEl = document.getElementById('weeklyChart');
+      const categoryBreakdownEl = document.getElementById('categoryBreakdown');
+      const habitWeeklyGridEl = document.getElementById('habitWeeklyGrid');
+      const budgetInputEl = document.getElementById('budgetInput');
+
+      const toastEl = document.getElementById('toast');
+      const toastTextEl = document.getElementById('toastText');
+      const toastUndoBtn = document.getElementById('toastUndoBtn');
+      const confirmModal = document.getElementById('confirmModal');
+
+      function showToast(msg, onUndo) {
+        clearTimeout(toastTimer);
+        toastTextEl.textContent = msg;
+        undoAction = onUndo || null;
+        if (undoAction) {
+          toastUndoBtn.classList.remove('hidden');
+        } else {
+          toastUndoBtn.classList.add('hidden');
+        }
+        toastEl.classList.remove('hidden');
+        toastTimer = setTimeout(() => {
+          toastEl.classList.add('hidden');
+          undoAction = null;
+        }, 4000);
+      }
+
+      function computeStreak(habit) {
+        const set = new Set(habit.completedDates || []);
+        let streak = 0;
+        let cursor = selectedDate;
+        if (!set.has(cursor)) {
+          cursor = shiftDate(cursor, -1);
+        }
+        while (set.has(cursor)) {
+          streak += 1;
+          cursor = shiftDate(cursor, -1);
+        }
+        return streak;
+      }
+
+      function getCategoryMeta(catId) {
+        return CATEGORIES.find(c => c.id === catId) || CATEGORIES[CATEGORIES.length - 1];
+      }
+
+      function renderHeader() {
+        const todayKey = toDateKey(new Date());
+        const dt = parseDateKey(selectedDate);
+        const yesterdayKey = shiftDate(todayKey, -1);
+        const tomorrowKey = shiftDate(todayKey, 1);
+
+        if (selectedDate === todayKey) {
+          dateLabel.textContent = 'Today';
+        } else if (selectedDate === yesterdayKey) {
+          dateLabel.textContent = 'Yesterday';
+        } else if (selectedDate === tomorrowKey) {
+          dateLabel.textContent = 'Tomorrow';
+        } else {
+          dateLabel.textContent = dt.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+        dateSubLabel.textContent = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        // Habit KPI
+        const totalHabits = state.habits.length;
+        const doneHabits = state.habits.filter(h => (h.completedDates || []).includes(selectedDate)).length;
+        const pct = totalHabits > 0 ? Math.round((doneHabits / totalHabits) * 100) : 0;
+        habitCountEl.textContent = `${doneHabits} / ${totalHabits}`;
+        habitPctEl.textContent = `${pct}%`;
+        habitBarEl.style.width = `${pct}%`;
+
+        // Expense KPI
+        const dayExpenses = state.expenses.filter(e => e.date === selectedDate);
+        const spent = dayExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+        daySpendEl.textContent = formatCurrency(spent);
+
+        if (state.dailyBudget > 0) {
+          const ratio = Math.min(100, Math.round((spent / state.dailyBudget) * 100));
+          budgetBarEl.style.width = `${ratio}%`;
+          if (spent > state.dailyBudget) {
+            budgetStatusEl.textContent = 'Over budget';
+            budgetBarEl.className = 'h-full bg-rose-400 rounded-full transition-all duration-300';
+          } else {
+            budgetStatusEl.textContent = `${ratio}% of ${formatCurrency(state.dailyBudget)}`;
+            budgetBarEl.className = 'h-full bg-amber-300 rounded-full transition-all duration-300';
+          }
+        } else {
+          budgetStatusEl.textContent = `${dayExpenses.length} item${dayExpenses.length === 1 ? '' : 's'}`;
+          budgetBarEl.style.width = '0%';
+        }
+      }
+
+      function renderHabits() {
+        habitListEl.innerHTML = '';
+        if (state.habits.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'bg-white rounded-2xl p-8 text-center border border-dashed border-slate-300';
+          empty.innerHTML = '<div class="text-3xl mb-2">🌱</div><p class="text-sm font-semibold text-slate-700">No habits yet</p><p class="text-xs text-slate-500 mt-1">Add your first daily habit above to start building streaks.</p>';
+          habitListEl.appendChild(empty);
+          return;
+        }
+
+        state.habits.forEach(habit => {
+          const isDone = (habit.completedDates || []).includes(selectedDate);
+          const streak = computeStreak(habit);
+
+          const card = document.createElement('div');
+          card.className = `flex items-center gap-3 p-3.5 rounded-2xl border transition ${
+            isDone
+              ? 'bg-emerald-50/70 border-emerald-200'
+              : 'bg-white border-slate-200/70 shadow-sm'
+          }`;
+
+          const toggleBtn = document.createElement('button');
+          toggleBtn.type = 'button';
+          toggleBtn.setAttribute('aria-label', `Toggle ${habit.name}`);
+          toggleBtn.className = `check-pop w-7 h-7 rounded-full flex items-center justify-center border-2 shrink-0 ${
+            isDone
+              ? 'bg-emerald-500 border-emerald-500 text-white'
+              : 'border-slate-300 bg-white hover:border-teal-500'
+          }`;
+          if (isDone) {
+            toggleBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+          }
+          toggleBtn.addEventListener('click', () => toggleHabit(habit.id));
+
+          const info = document.createElement('div');
+          info.className = 'flex-1 min-w-0 cursor-pointer';
+          info.addEventListener('click', () => toggleHabit(habit.id));
+
+          const titleRow = document.createElement('div');
+          titleRow.className = 'flex items-center gap-2';
+
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'text-base shrink-0';
+          iconSpan.textContent = habit.icon || '⭐';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = `text-sm font-semibold truncate ${isDone ? 'line-through text-slate-400' : 'text-slate-800'}`;
+          nameSpan.textContent = habit.name;
+
+          titleRow.appendChild(iconSpan);
+          titleRow.appendChild(nameSpan);
+
+          const sub = document.createElement('div');
+          sub.className = 'text-xs text-slate-500 mt-0.5';
+          sub.textContent = streak > 0 ? `🔥 ${streak} day streak` : 'Tap to complete';
+
+          info.appendChild(titleRow);
+          info.appendChild(sub);
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.setAttribute('aria-label', `Delete ${habit.name}`);
+          delBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0';
+          delBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
+          delBtn.addEventListener('click', () => deleteHabit(habit.id));
+
+          card.appendChild(toggleBtn);
+          card.appendChild(info);
+          card.appendChild(delBtn);
+          habitListEl.appendChild(card);
+        });
+      }
+
+      function renderExpenses() {
+        // Category filter chips
+        categoryFiltersEl.innerHTML = '';
+        const filterNames = ['All', ...CATEGORIES.map(c => c.id)];
+        filterNames.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const active = selectedCategoryFilter === cat;
+          btn.className = `px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition ${
+            active
+              ? 'bg-teal-600 text-white shadow-xs'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          }`;
+          btn.textContent = cat;
+          btn.addEventListener('click', () => {
+            selectedCategoryFilter = cat;
+            renderExpenses();
+          });
+          categoryFiltersEl.appendChild(btn);
+        });
+
+        // Filtered expenses for selectedDate
+        const dayExpenses = state.expenses
+          .filter(e => e.date === selectedDate)
+          .filter(e => selectedCategoryFilter === 'All' || e.category === selectedCategoryFilter);
+
+        expenseListEl.innerHTML = '';
+        if (dayExpenses.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'bg-white rounded-2xl p-8 text-center border border-dashed border-slate-300';
+          empty.innerHTML = `<div class="text-3xl mb-2">🧾</div><p class="text-sm font-semibold text-slate-700">No expenses logged</p><p class="text-xs text-slate-500 mt-1">${selectedCategoryFilter === 'All' ? 'Add a purchase above to track your daily spending.' : 'No expenses in ' + selectedCategoryFilter + ' for this day.'}</p>`;
+          expenseListEl.appendChild(empty);
+          return;
+        }
+
+        dayExpenses.forEach(exp => {
+          const meta = getCategoryMeta(exp.category);
+          const card = document.createElement('div');
+          card.className = 'flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-slate-200/70 shadow-sm';
+
+          const badge = document.createElement('div');
+          badge.className = `w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${meta.color}`;
+          badge.textContent = meta.icon;
+
+          const info = document.createElement('div');
+          info.className = 'flex-1 min-w-0';
+
+          const title = document.createElement('div');
+          title.className = 'text-sm font-semibold text-slate-800 truncate';
+          title.textContent = exp.title;
+
+          const sub = document.createElement('div');
+          sub.className = 'text-xs text-slate-500';
+          sub.textContent = exp.category;
+
+          info.appendChild(title);
+          info.appendChild(sub);
+
+          const amt = document.createElement('div');
+          amt.className = 'text-sm font-bold text-slate-900 shrink-0';
+          amt.textContent = formatCurrency(exp.amount);
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.setAttribute('aria-label', `Delete ${exp.title}`);
+          delBtn.className = 'w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0';
+          delBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
+          delBtn.addEventListener('click', () => deleteExpense(exp.id));
+
+          card.appendChild(badge);
+          card.appendChild(info);
+          card.appendChild(amt);
+          card.appendChild(delBtn);
+          expenseListEl.appendChild(card);
+        });
+      }
+
+      function renderSummary() {
+        const last7 = [];
+        for (let i = 6; i >= 0; i--) {
+          last7.push(shiftDate(selectedDate, -i));
+        }
+
+        // Weekly spending
+        const totals = last7.map(d =>
+          state.expenses
+            .filter(e => e.date === d)
+            .reduce((s, e) => s + Number(e.amount || 0), 0)
+        );
+        const weekSum = totals.reduce((a, b) => a + b, 0);
+        const maxDay = Math.max(...totals, state.dailyBudget > 0 ? state.dailyBudget : 100, 1);
+
+        weeklySpendTotalEl.textContent = `Total: ${formatCurrency(weekSum)}`;
+        dailyBudgetBadgeEl.textContent = state.dailyBudget > 0
+          ? `Budget: ${formatCurrency(state.dailyBudget)}/day`
+          : 'No daily limit';
+        budgetInputEl.value = state.dailyBudget;
+
+        weeklyChartEl.innerHTML = '';
+        last7.forEach((d, idx) => {
+          const val = totals[idx];
+          const heightPct = val > 0 ? Math.max(8, Math.round((val / maxDay) * 100)) : 4;
+          const dt = parseDateKey(d);
+          const dayShort = dt.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2);
+          const isSelected = d === selectedDate;
+          const overBudget = state.dailyBudget > 0 && val > state.dailyBudget;
+
+          const col = document.createElement('div');
+          col.className = 'flex flex-col items-center h-full justify-end gap-1.5';
+
+          const valLbl = document.createElement('span');
+          valLbl.className = 'text-[10px] font-medium text-slate-500 truncate max-w-full';
+          valLbl.textContent = val > 0 ? (val >= 1000 ? `${(val / 1000).toFixed(1)}k` : Math.round(val)) : '';
+
+          const track = document.createElement('div');
+          track.className = 'w-full flex-1 flex items-end justify-center';
+
+          const bar = document.createElement('div');
+          bar.className = `w-6 sm:w-7 rounded-t-lg transition-all duration-300 ${
+            val === 0
+              ? 'bg-slate-100'
+              : overBudget
+                ? 'bg-rose-400'
+                : isSelected
+                  ? 'bg-teal-600'
+                  : 'bg-teal-300'
+          }`;
+          bar.style.height = `${heightPct}%`;
+          track.appendChild(bar);
+
+          const lbl = document.createElement('span');
+          lbl.className = `text-[11px] ${isSelected ? 'font-bold text-teal-700' : 'text-slate-500'}`;
+          lbl.textContent = dayShort;
+
+          col.appendChild(valLbl);
+          col.appendChild(track);
+          col.appendChild(lbl);
+          weeklyChartEl.appendChild(col);
+        });
+
+        // Category breakdown (last 7 days)
+        const last7Set = new Set(last7);
+        const catTotals = {};
+        state.expenses
+          .filter(e => last7Set.has(e.date))
+          .forEach(e => {
+            catTotals[e.category] = (catTotals[e.category] || 0) + Number(e.amount || 0);
+          });
+
+        categoryBreakdownEl.innerHTML = '';
+        const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+        if (sortedCats.length === 0) {
+          categoryBreakdownEl.innerHTML = '<p class="text-xs text-slate-500">Log expenses to see your category breakdown.</p>';
+        } else {
+          sortedCats.forEach(([catId, sum]) => {
+            const meta = getCategoryMeta(catId);
+            const pct = weekSum > 0 ? Math.round((sum / weekSum) * 100) : 0;
+            const row = document.createElement('div');
+            row.className = 'space-y-1';
+            row.innerHTML = `
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-medium text-slate-700">${meta.icon} ${catId}</span>
+                <span class="font-semibold text-slate-800">${formatCurrency(sum)} <span class="text-slate-400 font-normal">(${pct}%)</span></span>
+              </div>
+              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full ${meta.bar} rounded-full" style="width: ${pct}%"></div>
+              </div>
+            `;
+            categoryBreakdownEl.appendChild(row);
+          });
+        }
+
+        // 7-day habit consistency grid
+        habitWeeklyGridEl.innerHTML = '';
+        if (state.habits.length === 0) {
+          habitWeeklyGridEl.innerHTML = '<p class="text-xs text-slate-500">Add habits to track your 7-day consistency.</p>';
+        } else {
+          state.habits.forEach(h => {
+            const doneSet = new Set(h.completedDates || []);
+            const count = last7.filter(d => doneSet.has(d)).length;
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between gap-2';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'text-xs font-medium text-slate-700 truncate flex-1';
+            nameEl.textContent = `${h.icon || '⭐'} ${h.name}`;
+
+            const dots = document.createElement('div');
+            dots.className = 'flex items-center gap-1 shrink-0';
+            last7.forEach(d => {
+              const dot = document.createElement('span');
+              dot.className = `w-4 h-4 rounded-full ${doneSet.has(d) ? 'bg-emerald-500' : 'bg-slate-200'}`;
+              dot.title = d;
+              dots.appendChild(dot);
+            });
+
+            const score = document.createElement('span');
+            score.className = 'text-xs font-semibold text-slate-500 w-8 text-right shrink-0';
+            score.textContent = `${count}/7`;
+
+            row.appendChild(nameEl);
+            row.appendChild(dots);
+            row.appendChild(score);
+            habitWeeklyGridEl.appendChild(row);
+          });
+        }
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderHabits();
+        renderExpenses();
+        renderSummary();
+      }
+
+      // Actions
+      function toggleHabit(id) {
+        const habit = state.habits.find(h => h.id === id);
+        if (!habit) return;
+        const dates = habit.completedDates || [];
+        const idx = dates.indexOf(selectedDate);
+        if (idx >= 0) {
+          dates.splice(idx, 1);
+        } else {
+          dates.push(selectedDate);
+        }
+        habit.completedDates = dates;
+        saveState();
+        renderAll();
+      }
+
+      function deleteHabit(id) {
+        const idx = state.habits.findIndex(h => h.id === id);
+        if (idx === -1) return;
+        const removed = state.habits.splice(idx, 1)[0];
+        saveState();
+        renderAll();
+        showToast(`Deleted "${removed.name}"`, () => {
+          state.habits.splice(idx, 0, removed);
+          saveState();
+          renderAll();
+        });
+      }
+
+      function deleteExpense(id) {
+        const idx = state.expenses.findIndex(e => e.id === id);
+        if (idx === -1) return;
+        const removed = state.expenses.splice(idx, 1)[0];
+        saveState();
+        renderAll();
+        showToast(`Removed ${removed.title}`, () => {
+          state.expenses.splice(idx, 0, removed);
+          saveState();
+          renderAll();
+        });
+      }
+
+      function switchTab(tab) {
+        activeTab = tab;
+        ['habits', 'expenses', 'summary'].forEach(t => {
+          const sec = document.getElementById(`tab-${t}`);
+          if (t === tab) {
+            sec.classList.remove('hidden');
+          } else {
+            sec.classList.add('hidden');
+          }
+        });
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          const isCurrent = btn.dataset.tab === tab;
+          btn.className = `nav-btn flex flex-col items-center justify-center py-2.5 transition ${
+            isCurrent ? 'text-teal-700 font-semibold' : 'text-slate-400 hover:text-slate-600 font-medium'
+          }`;
+        });
+      }
+
+      // Event Listeners
+      document.getElementById('prevDayBtn').addEventListener('click', () => {
+        selectedDate = shiftDate(selectedDate, -1);
+        renderAll();
+      });
+
+      document.getElementById('nextDayBtn').addEventListener('click', () => {
+        selectedDate = shiftDate(selectedDate, 1);
+        renderAll();
+      });
+
+      document.getElementById('todayBtn').addEventListener('click', () => {
+        selectedDate = toDateKey(new Date());
+        renderAll();
+      });
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      document.querySelectorAll('.icon-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedIcon = btn.dataset.icon;
+          document.querySelectorAll('.icon-choice').forEach(b => {
+            b.className = 'icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-slate-100 hover:bg-slate-200 shrink-0';
+          });
+          btn.className = 'icon-choice w-8 h-8 rounded-lg flex items-center justify-center text-base bg-teal-50 ring-2 ring-teal-500 shrink-0';
+        });
+      });
+
+      document.getElementById('habitForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const input = document.getElementById('habitInput');
+        const name = input.value.trim();
+        if (!name) return;
+        state.habits.unshift({
+          id: 'h_' + Date.now(),
+          name,
+          icon: selectedIcon,
+          completedDates: []
+        });
+        input.value = '';
+        saveState();
+        renderAll();
+        showToast('Habit added');
+      });
+
+      document.getElementById('expenseForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const titleEl = document.getElementById('expenseTitle');
+        const amtEl = document.getElementById('expenseAmount');
+        const catEl = document.getElementById('expenseCategory');
+        const title = titleEl.value.trim();
+        const amount = parseFloat(amtEl.value);
+        if (!title || isNaN(amount) || amount <= 0) {
+          showToast('Enter an item name and valid amount');
+          return;
+        }
+        state.expenses.unshift({
+          id: 'e_' + Date.now(),
+          date: selectedDate,
+          title,
+          amount,
+          category: catEl.value
+        });
+        titleEl.value = '';
+        amtEl.value = '';
+        selectedCategoryFilter = 'All';
+        saveState();
+        renderAll();
+        showToast(`Added ${formatCurrency(amount)}`);
+      });
+
+      document.getElementById('budgetForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const val = parseFloat(budgetInputEl.value);
+        if (isNaN(val) || val < 0) return;
+        state.dailyBudget = val;
+        saveState();
+        renderAll();
+        showToast('Daily budget updated');
+      });
+
+      document.getElementById('exportBtn').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dailyflow-backup-${toDateKey(new Date())}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('Backup downloaded');
+      });
+
+      document.getElementById('importInput').addEventListener('change', e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            if (!Array.isArray(parsed.habits) || !Array.isArray(parsed.expenses)) {
+              showToast('Invalid backup file');
+              return;
+            }
+            state = {
+              dailyBudget: typeof parsed.dailyBudget === 'number' ? parsed.dailyBudget : 1000,
+              habits: parsed.habits,
+              expenses: parsed.expenses
+            };
+            saveState();
+            renderAll();
+            showToast('Backup restored');
+          } catch (err) {
+            showToast('Could not read backup file');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        confirmModal.classList.remove('hidden');
+        confirmModal.classList.add('flex');
+      });
+
+      document.getElementById('cancelResetBtn').addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
+        confirmModal.classList.remove('flex');
+      });
+
+      document.getElementById('confirmResetBtn').addEventListener('click', () => {
+        state.expenses = [];
+        state.habits = state.habits.map(h => ({ ...h, completedDates: [] }));
+        saveState();
+        renderAll();
+        confirmModal.classList.add('hidden');
+        confirmModal.classList.remove('flex');
+        showToast('Expenses & history cleared');
+      });
+
+      toastUndoBtn.addEventListener('click', () => {
+        if (undoAction) {
+          undoAction();
+          undoAction = null;
+        }
+        toastEl.classList.add('hidden');
+      });
+
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
